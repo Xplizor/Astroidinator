@@ -14,14 +14,21 @@
 LiquidCrystal_I2C AstroidinatorLcd(0x27, 20, 4);
 SimpleTimer tmrGame;
 
+//Structs
+struct Astroid {
+  String type;
+  int yPosition;
+  int xPosition;
+  long randomYPosition = random(20, 200);
+  long randomXPosition = random(0, 3);
+}
+
 //Globals
 bool enableLogNjan;
 int rowNjan;
 int columnNjan;
 
 //Pins
-int diSwitchNjan = 2;
-int aiXaxisNjan = A0;
 int aiYaxisNjan = A1;
 
 void setup() {
@@ -127,8 +134,6 @@ void InitGlobals() {
 void InitPins() {
   Serial.println("Init pins..");
 
-  pinMode(diSwitchNjan, INPUT);
-  pinMode(aiXaxisNjan, INPUT);
   pinMode(aiYaxisNjan, INPUT);
   
   Serial.println("Finished.");
