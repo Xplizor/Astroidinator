@@ -9,6 +9,7 @@
 
 //Objects
 LiquidCrystal_I2C AstroidinatorLcd(0x27, 20, 4);
+SimpleTimer tmrGame;
 
 //Globals
 bool enableLog;
@@ -36,6 +37,7 @@ void InitLcd()
   AstroidinatorLcd.setCursor(0, 0);
   //AstroidinatorLcd.print("Alex Mares");
 }
+
 void InitCredentials()
 {
   WriteToLcd(0, 0, "Astroidinator");
@@ -45,24 +47,33 @@ void InitCredentials()
   delay(2000);
   AstroidinatorLcd.clear();
 }
+
 void InitStartGame()
 {
   WriteToLcd(0, 0, "Start!");
   delay(1000);
   AstroidinatorLcd.clear();
-  WriteToLcd(0, 3, "Score: ..  Time: ..");
+  tmrGame.setInterval(1000, UpdateDisplay);
 }
+
 void InitGlobals()
 {
   Serial.println("Init globals..");
   enableLog == true;
   Serial.println("Finished.");
 }
+
 void WriteToLcd(int a_x, int a_y, String a_text)
 {
     AstroidinatorLcd.setCursor(a_x, a_y);
     AstroidinatorLcd.print(a_text);
 }
+
+void UpdateDisplay() 
+{
+  WriteToLcd(0, 3, "Score: Time:");
+}
+
 void DebugLogging(String a_text, int a_infoType)
 {
   if (enableLog == true)
