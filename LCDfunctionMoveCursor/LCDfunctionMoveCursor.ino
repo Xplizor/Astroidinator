@@ -21,7 +21,11 @@ struct Astroid {
   int xPosition;
   long randomYPosition = random(20, 200);
   long randomXPosition = random(0, 3);
+<<<<<<< Updated upstream
 };
+=======
+}
+>>>>>>> Stashed changes
 
 //Globals
 bool enableLogNjan;
