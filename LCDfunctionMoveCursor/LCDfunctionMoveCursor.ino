@@ -21,12 +21,13 @@ struct Astroid {
   int xPosition;
   long randomYPosition = random(20, 200);
   long randomXPosition = random(0, 3);
-}
+};
 
 //Globals
 bool enableLogNjan;
 int rowNjan;
 int columnNjan;
+Astroid astroids[20];
 
 //Pins
 int aiYaxisNjan = A1;
@@ -40,21 +41,41 @@ void setup() {
   InitLcd();
   InitCredentials();
   InitStartGame();
+  GenerateAstroids();
 }
 
 void loop() {
   tmrGame.run();
 }
 
+void GenerateAstroids() {
+  for (int i = 0; i <= sizeof(astroids); i++) {
+    Astroid astroid;
+    astroid.yPosition = astroid.randomYPosition;
+    astroid.xPosition = astroid.randomXPosition;
+    astroids[i] = astroid;
+  }
+
+  Serial.println(String(astroids[10].randomYPosition));
+}
+
+void MoveAstroids() {
+  for (int i = 0; i <= sizeof(astroids) - 1; i++) {
+    astroids[i].yPosition--;
+    astroids[i].xPosition--;
+
+    if (astroids[i].yPosition < 20) {
+      WriteToLcd(astroids[i].yPosition, astroids[i].xPosition, "*");
+    }
+  }
+}
+
 void UpdateDisplay() {
   AstroidinatorLcd.clear();
   AstroidinatorLcd.setBacklight(1);
   
-  WriteToLcd(columnNjan, 2, "*");
-
   ControlJoystick();
-      
-  DebugLogging(String(map(analogRead(aiYaxisNjan), 0, 1023, 0, 3)), 2);
+ 
   WriteToLcd(0, rowNjan,"=");
  
   if (columnNjan == 0) {
