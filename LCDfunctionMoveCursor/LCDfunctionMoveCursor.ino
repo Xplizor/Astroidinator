@@ -15,11 +15,11 @@ LiquidCrystal_I2C AstroidinatorLcd(0x27, 20, 4);
 SimpleTimer tmrGame;
 
 //Structs
-struct Astroid {
+struct Ufo {
   String type;
   int yPosition;
   int xPosition;
-  long randomYPosition = random(20, 200);
+  long randomYPosition = random(20, 100);
   long randomXPosition = random(0, 3);
 };
 
@@ -27,7 +27,14 @@ struct Astroid {
 bool enableLogNjan;
 int rowNjan;
 int columnNjan;
-Astroid astroids[20];
+
+int astroidNumber = 20;
+Ufo astroids[20];
+
+int shipNumber = 10;
+Ufo ships[10];
+
+int counter;
 
 //Pins
 int aiYaxisNjan = A1;
@@ -41,7 +48,6 @@ void setup() {
   InitLcd();
   InitCredentials();
   InitStartGame();
-  GenerateAstroids();
 }
 
 void loop() {
@@ -49,46 +55,81 @@ void loop() {
 }
 
 void GenerateAstroids() {
-  for (int i = 0; i <= sizeof(astroids); i++) {
-    Astroid astroid;
+  for (int i = 0; i < astroidNumber - 1; i++) {
+    Ufo astroid;
+    astroid.type = "astroid";
     astroid.yPosition = astroid.randomYPosition;
     astroid.xPosition = astroid.randomXPosition;
-    astroids[i] = astroid;
-  }
 
-  Serial.println(String(astroids[10].randomYPosition));
+    if ((astroid.yPosition % 2) == 0) {
+      astroid.yPosition++;
+    }
+    
+    astroids[i] = astroid;   
+  }
+}
+
+void GenerateShips() {
+  for (int i = 0; i < shipNumber - 1; i++) {
+    Ufo ship;
+    ship.type = "ship";
+    ship.yPosition = ship.randomYPosition;
+    ship.xPosition = ship.randomXPosition;
+
+    if ((ship.yPosition % 2) != 0) {
+      ship.yPosition++;
+    }
+    
+    ships[i] = ship;   
+  }
 }
 
 void MoveAstroids() {
-  for (int i = 0; i <= sizeof(astroids) - 1; i++) {
-    astroids[i].yPosition--;
-    astroids[i].xPosition--;
-
-    if (astroids[i].yPosition < 20) {
+  for (int i = 0; i < astroidNumber - 1; i++) {
+    
+    if (astroids[i].yPosition < 20 && astroids[i].yPosition > 0) {
       WriteToLcd(astroids[i].yPosition, astroids[i].xPosition, "*");
     }
+
+    if (astroids[i].yPosition == 0 && astroids[i].xPosition == rowNjan) {
+      AstroidinatorLcd.setBacklight(0);
+    }
+
+    astroids[i].yPosition--;
+  }
+}
+
+void MoveShips() {
+  for (int i = 0; i < shipNumber - 1; i++) {
+    
+    if (ships[i].yPosition < 20 && ships[i].yPosition > 0) {
+      WriteToLcd(ships[i].yPosition, ships[i].xPosition, "<");
+    }
+
+    if (ships[i].yPosition == 0 && ships[i].xPosition == rowNjan) {
+      AstroidinatorLcd.setBacklight(0);
+    }
+
+    ships[i].yPosition--;
   }
 }
 
 void UpdateDisplay() {
   AstroidinatorLcd.clear();
   AstroidinatorLcd.setBacklight(1);
+    
+  if (counter == 0) {
+    GenerateAstroids();
+    GenerateShips();
+    counter = 100;
+  }
+  counter--;
   
   ControlJoystick();
- 
-  WriteToLcd(0, rowNjan,"=");
- 
-  if (columnNjan == 0) {
-    if (rowNjan == 2) {
-       AstroidinatorLcd.setBacklight(0);
-    }
-  }
- 
-  if (columnNjan == 0) {
-    columnNjan = 19;
-  } else {
-    columnNjan--;
-  }
+  MoveAstroids();
+  MoveShips();
+
+  
 }
 
 void ControlJoystick() {
@@ -114,6 +155,8 @@ void ControlJoystick() {
       }
       break;
   }
+
+  WriteToLcd(0, rowNjan,"=");
 }
 
 void WriteToLcd(int a_x, int a_y, String a_text) {
@@ -139,7 +182,9 @@ void InitStartGame() {
   WriteToLcd(0,0,"Start!");
   delay(2000);
   AstroidinatorLcd.clear();
-  tmrGame.setInterval(120, UpdateDisplay);
+  tmrGame.setInterval(250, UpdateDisplay);
+  GenerateAstroids();
+  GenerateShips();
 }
 
 void InitGlobals() {
@@ -148,6 +193,7 @@ void InitGlobals() {
   enableLogNjan = true;
   rowNjan = 1;
   columnNjan = 19;
+  counter = 100;
 
   Serial.println("Finished.");
 }
