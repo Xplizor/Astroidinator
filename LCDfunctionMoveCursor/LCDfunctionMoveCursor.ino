@@ -15,30 +15,30 @@ LiquidCrystal_I2C AstroidinatorLcd(0x27, 20, 4);
 SimpleTimer tmrGame;
 
 //Structs
-struct Ufo {
-  String type;
-  int yPosition;
-  int xPosition;
-  long randomYPosition = random(20, 100);
-  long randomXPosition = random(0, 3);
-<<<<<<< Updated upstream
+struct UfoNjan {
+  String typeNjan;
+  int yPositionNjan;
+  int xPositionNjan;
+  long randomYPositionNjan = random(20, 100);
+  long randomXPositionNjan = random(0, 3);
 };
-=======
-}
->>>>>>> Stashed changes
 
 //Globals
 bool enableLogNjan;
 int rowNjan;
 int columnNjan;
 
-int astroidNumber = 20;
-Ufo astroids[20];
+int astroidNumberNjan = 20;
+UfoNjan astroidsNjan[20];
 
-int shipNumber = 10;
-Ufo ships[10];
+int shipNumberNjan = 10;
+UfoNjan shipsNjan[10];
 
-int counter;
+int counterNjan;
+
+int AstCollAmar = 0;
+int elapsedTimeAmar = 0;
+int ShipCollAmar = 0;
 
 //Pins
 int aiYaxisNjan = A1;
@@ -59,62 +59,62 @@ void loop() {
 }
 
 void GenerateAstroids() {
-  for (int i = 0; i < astroidNumber - 1; i++) {
-    Ufo astroid;
-    astroid.type = "astroid";
-    astroid.yPosition = astroid.randomYPosition;
-    astroid.xPosition = astroid.randomXPosition;
+  for (int i = 0; i < astroidNumberNjan - 1; i++) {
+    UfoNjan astroidNjan;
+    astroidNjan.typeNjan = "astroid";
+    astroidNjan.yPositionNjan = astroidNjan.randomYPositionNjan;
+    astroidNjan.xPositionNjan = astroidNjan.randomXPositionNjan;
 
-    if ((astroid.yPosition % 2) == 0) {
-      astroid.yPosition++;
+    if ((astroidNjan.yPositionNjan % 2) == 0) {
+      astroidNjan.yPositionNjan++;
     }
-    
-    astroids[i] = astroid;   
+    astroidsNjan[i] = astroidNjan;   
   }
 }
 
 void GenerateShips() {
-  for (int i = 0; i < shipNumber - 1; i++) {
-    Ufo ship;
-    ship.type = "ship";
-    ship.yPosition = ship.randomYPosition;
-    ship.xPosition = ship.randomXPosition;
+  for (int i = 0; i < shipNumberNjan - 1; i++) {
+    UfoNjan shipNjan;
+    shipNjan.typeNjan = "ship";
+    shipNjan.yPositionNjan = shipNjan.randomYPositionNjan;
+    shipNjan.xPositionNjan = shipNjan.randomXPositionNjan;
 
-    if ((ship.yPosition % 2) != 0) {
-      ship.yPosition++;
+    if ((shipNjan.yPositionNjan % 2) != 0) {
+      shipNjan.yPositionNjan++;
     }
     
-    ships[i] = ship;   
+    shipsNjan[i] = shipNjan;   
   }
 }
 
 void MoveAstroids() {
-  for (int i = 0; i < astroidNumber - 1; i++) {
+  for (int i = 0; i < astroidNumberNjan - 1; i++) {
     
-    if (astroids[i].yPosition < 20 && astroids[i].yPosition > 0) {
-      WriteToLcd(astroids[i].yPosition, astroids[i].xPosition, "*");
+    if (astroidsNjan[i].yPositionNjan < 20 && astroidsNjan[i].yPositionNjan > 0) {
+      WriteToLcd(astroidsNjan[i].yPositionNjan, astroidsNjan[i].xPositionNjan, "*");
     }
 
-    if (astroids[i].yPosition == 0 && astroids[i].xPosition == rowNjan) {
+    if (astroidsNjan[i].yPositionNjan == 0 && astroidsNjan[i].xPositionNjan == rowNjan) {
       AstroidinatorLcd.setBacklight(0);
+      ++AstCollAmar;
     }
 
-    astroids[i].yPosition--;
+    astroidsNjan[i].yPositionNjan--;
   }
 }
 
 void MoveShips() {
-  for (int i = 0; i < shipNumber - 1; i++) {
+  for (int i = 0; i < shipNumberNjan - 1; i++) {
     
-    if (ships[i].yPosition < 20 && ships[i].yPosition > 0) {
-      WriteToLcd(ships[i].yPosition, ships[i].xPosition, "<");
+    if (shipsNjan[i].yPositionNjan < 20 && shipsNjan[i].yPositionNjan > 0) {
+      WriteToLcd(shipsNjan[i].yPositionNjan, shipsNjan[i].xPositionNjan, "<");
     }
 
-    if (ships[i].yPosition == 0 && ships[i].xPosition == rowNjan) {
+    if (shipsNjan[i].yPositionNjan == 0 && shipsNjan[i].xPositionNjan == rowNjan) {
       AstroidinatorLcd.setBacklight(0);
+      ++ShipCollAmar;
     }
-
-    ships[i].yPosition--;
+    shipsNjan[i].yPositionNjan--;
   }
 }
 
@@ -122,18 +122,18 @@ void UpdateDisplay() {
   AstroidinatorLcd.clear();
   AstroidinatorLcd.setBacklight(1);
     
-  if (counter == 0) {
+  if (counterNjan == 0) {
     GenerateAstroids();
     GenerateShips();
-    counter = 100;
+    counterNjan = 100;
   }
-  counter--;
+  counterNjan--;
   
   ControlJoystick();
   MoveAstroids();
   MoveShips();
 
-  
+  UpdateScores();
 }
 
 void ControlJoystick() {
@@ -174,10 +174,10 @@ void InitLcd(){
 }
 
 void InitCredentials() {
-  WriteToLcd(0,0,"Game name:");
-  WriteToLcd(0,1,"Made by:");
-  WriteToLcd(0,2,"Date:");
-  WriteToLcd(0,3,"Version:");
+  WriteToLcd(0, 0, "Astroidinator");
+  WriteToLcd(0, 1, "Date: 18/04/2018");
+  WriteToLcd(0, 2, "By: Nordin & Alex");
+  WriteToLcd(0, 3, "Version: V0");
   delay(2000);
   AstroidinatorLcd.clear();
 }
@@ -197,7 +197,7 @@ void InitGlobals() {
   enableLogNjan = true;
   rowNjan = 1;
   columnNjan = 19;
-  counter = 100;
+  counterNjan = 100;
 
   Serial.println("Finished.");
 }
@@ -208,6 +208,27 @@ void InitPins() {
   pinMode(aiYaxisNjan, INPUT);
   
   Serial.println("Finished.");
+}
+
+void UpdateScores()
+{
+  //  aantal ast coll
+  //  aantal sh coll
+  //  AstCollAmar = stubAstColl + 3; zo meteen niet meer nodig, waarde komt van Nordin
+  
+  elapsedTimeAmar++;
+
+  AstCollAmar = AstCollAmar - ShipCollAmar;
+  
+  WriteToLcd(0, 3, "Score:");
+  WriteToLcd(10, 3, "Time:");
+
+  //WriteToLcd(7, 3, "*");
+  WriteToLcd(7, 3, (String)AstCollAmar);
+  WriteToLcd(16, 3, (String)elapsedTimeAmar);
+
+  ShipCollAmar = 0;
+  DebugLogging("ast: " + (String)AstCollAmar, 0);
 }
 
 void DebugLogging(String a_text, int a_infoType) {
